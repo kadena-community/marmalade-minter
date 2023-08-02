@@ -1,0 +1,1 @@
+export const extractPubKey = (accountName) => accountName.split(":")[1];
