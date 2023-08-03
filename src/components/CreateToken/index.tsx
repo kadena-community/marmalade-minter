@@ -1,8 +1,9 @@
 import React from 'react';
 import {getClient, ICommand, literal, Pact, signWithChainweaver} from "@kadena/client";
 import {extractPubKey} from "@/utils/stringHelpers";
+import {toast} from "react-toastify";
 
-const CreateToken = ({onSubmit, createTokenIdData, accountName}) => {
+const CreateToken = ({onSubmit, createTokenIdData, accountName, onSign, isLoading, setIsLoading}) => {
     const client = getClient();
     const {url, precision, policies, tokenId} = createTokenIdData;
 
@@ -23,16 +24,50 @@ const CreateToken = ({onSubmit, createTokenIdData, accountName}) => {
             .setNetworkId('testnet04')
             .createTransaction();
 
-        console.log(unsignedTransaction)
-        const signedTransaction = await signWithChainweaver(unsignedTransaction);
-        console.log({signedTransaction})
+        let signedTransaction;
+        try {
+            onSign(true);
+            signedTransaction = await signWithChainweaver(unsignedTransaction);
+            console.log({signedTransaction})
+            onSign(false);
+        }
+        catch (e){
+            console.log(e);
+            onSign(false);
+            toast.error("Transaction Rejected");
+            return;
+        }
 
-        const requestKeys = await client.submit(signedTransaction as ICommand);
-        console.log({requestKeys})
+        let requestKeys;
+        try {
+            setIsLoading(true)
+            requestKeys = await client.submit(signedTransaction as ICommand);
+            console.log({requestKeys})
+        }
+        catch (e){
+            console.log(e)
+            setIsLoading(false);
+            toast.error("Can't submit transaction");
+            return;
+        }
 
-        const result = await client.pollStatus(requestKeys);
-        console.log({result})
+        let result;
+        try {
+            result = await client.pollStatus(requestKeys);
+            if(result[requestKeys].result.status === "failure") {
+                toast.error(result[requestKeys].result.error.message);
+                setIsLoading(false);
+                return;
+            }
+        }
+        catch (e){
+            console.log(e)
+            setIsLoading(false);
+            toast.error("Can't submit transaction");
+            return;
+        }
 
+        setIsLoading(false);
         return result[requestKeys].result.data;
     };
 
@@ -41,12 +76,15 @@ const CreateToken = ({onSubmit, createTokenIdData, accountName}) => {
 
         const result = await handleCreateToken();
 
-        onSubmit(result)
+        if(result) {
+            onSubmit(result)
+        }
     }
 
     return (
         <form onSubmit={handleSubmit}>
-            <button type="submit">Submit</button>
+            <p>The Token ID has been created, now you need to submit to create a Token!</p>
+            <button disabled={isLoading} type="submit">Submit</button>
         </form>
     )
 }

@@ -105,3 +105,53 @@ a {
     color-scheme: dark;
   }
 }
+
+input, textarea {
+  border: solid 1px #666;
+  padding: 10px;
+  font-size: 14px;
+  display: block;
+  width: 100%;
+  background: #ffffff;
+  color: #2d2d2d;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 200px;
+}
+
+button {
+  display: block;
+  margin: 0 auto;
+  padding: 10px;
+  font-size: 16px;
+  width: 200px;
+  max-width: 100%;
+  background-color: #e18438;
+  border: none;
+  cursor: pointer;
+  color: #ffffff;
+}
+
+button[disabled] {
+  opacity: 0.6;
+}
+
+label {
+  color: #2d2d2d;
+  margin-bottom: 5px;
+  display: block;
+}
+
+code {
+  background-color: #2d2d2d;
+  color: #e18438;
+  padding: 10px;
+  width: 100%;
+  overflow: auto;
+  margin-top: 10px;
+  display: block;
+}
