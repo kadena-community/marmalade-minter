@@ -65,7 +65,7 @@ const Home = () => {
 
             />
         ),
-        tokenPreview: <TokenPreview tokenId={createTokenIdData.tokenId} />,
+        tokenPreview: <TokenPreview tokenId={createTokenIdData?.tokenId} />,
     }
 
     return (
